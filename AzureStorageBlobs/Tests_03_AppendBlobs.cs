@@ -50,5 +50,42 @@ namespace AzureStorageBlobs
                 }
             }
         }
+
+        [Fact(DisplayName = "Should Lease Blob")]
+        public async Task ShouldLeaseBlob()
+        {
+            var cloudBlobContainer = _cloudClient.GetContainerReference(ContainerName);
+            await cloudBlobContainer.CreateIfNotExistsAsync();
+
+            var blob = cloudBlobContainer.GetAppendBlobReference("lease.data");
+            await blob.CreateOrReplaceAsync();
+
+            var leaseGuid = Guid.NewGuid().ToString();
+            var accessCondition = new AccessCondition();
+            var operationContext = new OperationContext();
+
+            var leaseId = await blob.AcquireLeaseAsync(null, leaseGuid, accessCondition, null, operationContext);
+            accessCondition.LeaseId = leaseId;
+
+            var data = "quos imitatae matronae complures opertis capitibus et basternis per latera civitatis cuncta discurrunt";
+            LeaseStatus leaseStatus;
+            try
+            {
+                leaseStatus = blob.Properties.LeaseStatus;
+                leaseStatus.Should().BeEquivalentTo(LeaseStatus.Unspecified);
+
+                await blob.AppendTextAsync(data, null, accessCondition, null, operationContext);
+
+                leaseStatus = blob.Properties.LeaseStatus;
+                leaseStatus.Should().BeEquivalentTo(LeaseStatus.Locked);
+            }
+            finally
+            {
+                await blob.ReleaseLeaseAsync(accessCondition, null, operationContext);
+
+                leaseStatus = blob.Properties.LeaseStatus;
+                leaseStatus.Should().BeEquivalentTo(LeaseStatus.Unlocked);
+            }
+        }
     }
 }
