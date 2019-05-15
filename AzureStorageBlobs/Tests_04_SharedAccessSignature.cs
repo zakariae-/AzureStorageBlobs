@@ -32,7 +32,7 @@ namespace AzureStorageBlobs
             _sas_read = _cloudBlobContainer.GetSharedAccessSignature(
                 new SharedAccessBlobPolicy()
                 {
-                    Permissions = SharedAccessBlobPermissions.Add | SharedAccessBlobPermissions.Read,
+                    Permissions = SharedAccessBlobPermissions.Read,
                     SharedAccessExpiryTime = DateTimeOffset.UtcNow.AddSeconds(50)
                 });
         }
