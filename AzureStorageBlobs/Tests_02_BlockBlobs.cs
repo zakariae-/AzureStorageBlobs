@@ -84,7 +84,7 @@ namespace AzureStorageBlobs
 
         private async Task UploadEachLineAsAnIndividualBlock()
         {
-            var cloudBlobContainer = _cloudClient.GetContainerReference(BlobName);
+            var cloudBlobContainer = _cloudClient.GetContainerReference(ContainerName);
             await cloudBlobContainer.CreateIfNotExistsAsync();
 
             var loadedAssemblyDirectory = FileProcess.GetLoadedAssemblyDirectory(Assembly.GetAssembly(GetType()));
@@ -131,7 +131,7 @@ namespace AzureStorageBlobs
         {
             await UploadEachLineAsAnIndividualBlock();
 
-            var cloudBlobContainer = _cloudClient.GetContainerReference(BlobName);
+            var cloudBlobContainer = _cloudClient.GetContainerReference(ContainerName);
             var blob = cloudBlobContainer.GetBlockBlobReference("text.txt");
 
             var isExists = await blob.ExistsAsync();
@@ -157,7 +157,7 @@ namespace AzureStorageBlobs
         {
             await ModifyABlockOnBlob();
 
-            var cloudBlobContainer = _cloudClient.GetContainerReference(BlobName);
+            var cloudBlobContainer = _cloudClient.GetContainerReference(ContainerName);
             var blob = cloudBlobContainer.GetBlockBlobReference("text.txt");
 
             var isExists = await blob.ExistsAsync();
